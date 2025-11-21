@@ -2,10 +2,13 @@ import mongoose from "mongoose";
 import { UserActivityRepositoryInterface } from "../../domains/userActivity/repositoryInterface.js";
 
 const UserLogSchema = new mongoose.Schema({
-  userId: String,
+  userId: { type: String, index: true },
   action: String,
-  timestamp: Date
+  timestamp: { type: Date, index: true }
 });
+
+// compound index for common queries (user + timestamp range)
+UserLogSchema.index({ userId: 1, timestamp: -1 });
 
 const UserLogModel = mongoose.model("UserLog", UserLogSchema);
 
