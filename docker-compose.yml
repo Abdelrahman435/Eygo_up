@@ -1,0 +1,62 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"
+      KAFKA_LISTENERS: "INSIDE://:9092,OUTSIDE://:9093"
+      KAFKA_ADVERTISED_LISTENERS: "INSIDE://kafka:9092,OUTSIDE://localhost:9093"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INSIDE"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9092"
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build: .
+    container_name: eyego_service
+    restart: always
+    depends_on:
+      - kafka
+      - mongodb
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    environment:
+      MONGO_URL: "mongodb://mongodb:27017/EyEgo"
+      KAFKA_BROKERS: "kafka:9092"
+
+volumes:
+  mongo_data:
