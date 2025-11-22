@@ -11,7 +11,6 @@ export const kafkaConsumer = (config, callback) => {
   return {
     async start(topic) {
       await consumer.connect();
-
       await consumer.subscribe({ topic, fromBeginning: false });
 
       await consumer.run({
@@ -22,15 +21,11 @@ export const kafkaConsumer = (config, callback) => {
             data = JSON.parse(message.value.toString());
           } catch (err) {
             console.error("Failed to parse Kafka message:", err);
-            console.error("Raw message value:", message.value.toString());
-            return; 
+            return;
           }
 
-          try {
-            await callback(data);
-          } catch (err) {
-            console.error("Error while processing message callback:", err);
-          }
+          // callback now handles saving + websocket emitting
+          await callback(data);
         },
       });
     },
