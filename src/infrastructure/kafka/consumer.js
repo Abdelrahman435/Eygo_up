@@ -24,7 +24,6 @@ export const kafkaConsumer = (config, callback) => {
             return;
           }
 
-          // callback now handles saving + websocket emitting
           await callback(data);
         },
       });
