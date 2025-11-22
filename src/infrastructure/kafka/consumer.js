@@ -12,7 +12,6 @@ export const kafkaConsumer = (config, callback) => {
     async start(topic) {
       await consumer.connect();
 
-      // الاشتراك في التوبك — fromBeginning = false يعني يبدأ من أحدث رسالة
       await consumer.subscribe({ topic, fromBeginning: false });
 
       await consumer.run({
@@ -20,18 +19,17 @@ export const kafkaConsumer = (config, callback) => {
           let data;
 
           try {
-            // parsing آمن
             data = JSON.parse(message.value.toString());
           } catch (err) {
-            console.error("❌ Failed to parse Kafka message:", err);
+            console.error("Failed to parse Kafka message:", err);
             console.error("Raw message value:", message.value.toString());
-            return; // skip the message
+            return; 
           }
 
           try {
             await callback(data);
           } catch (err) {
-            console.error("❌ Error while processing message callback:", err);
+            console.error("Error while processing message callback:", err);
           }
         },
       });

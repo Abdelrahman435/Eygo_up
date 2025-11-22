@@ -7,13 +7,10 @@ export default class UserActivityController {
     this.topic = topic;
   }
 
-  // Instead of saving directly → send to Kafka
   logActivity = async (req, res) => {
     try {
-      // validate only (reuse same validator)
       validateUserActivity(req.body);
 
-      // send to Kafka
       await this.producer.send(this.topic, req.body);
 
       return res.status(202).json({
@@ -25,7 +22,6 @@ export default class UserActivityController {
     }
   };
 
-  // Read from MongoDB normally
   getActivities = async (req, res) => {
     try {
       const result = await this.service.getActivities(req.query);

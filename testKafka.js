@@ -2,7 +2,7 @@ import { Kafka, logLevel } from "kafkajs";
 
 const kafka = new Kafka({
   clientId: "test-client",
-  brokers: ["localhost:9092"], // استخدم localhost بدل kafka
+  brokers: ["localhost:9092"],
 });
 
 const producer = kafka.producer();

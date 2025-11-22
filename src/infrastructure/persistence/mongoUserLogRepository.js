@@ -7,7 +7,6 @@ const UserLogSchema = new mongoose.Schema({
   timestamp: { type: Date, index: true }
 });
 
-// compound index for common queries (user + timestamp range)
 UserLogSchema.index({ userId: 1, timestamp: -1 });
 
 const UserLogModel = mongoose.model("UserLog", UserLogSchema);
