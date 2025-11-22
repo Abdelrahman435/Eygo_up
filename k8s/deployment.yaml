@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eyego-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eyego
+  template:
+    metadata:
+      labels:
+        app: eyego
+    spec:
+      containers:
+        - name: eyego
+          image: YOUR_DOCKER_REGISTRY/eyego_service:latest
+          ports:
+            - containerPort: 4000
+          env:
+            - name: PORT
+              value: "4000"
+            - name: MONGO_URL
+              value: "mongodb://mongodb:27017/EyEgo"
+            - name: KAFKA_BROKERS
+              value: "kafka:9092"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eyego-svc
+spec:
+  selector:
+    app: eyego
+  ports:
+    - port: 80
+      targetPort: 4000
+  type: LoadBalancer
